@@ -37,6 +37,7 @@ import { ByteSize, FileOperationError, FileOperationResult, IFileService, TooLar
 import { IBoundarySashes } from 'vs/base/browser/ui/sash/sash';
 import { IPreferencesService } from 'vs/workbench/services/preferences/common/preferences';
 import { StopWatch } from 'vs/base/common/stopwatch';
+import { DiffEditorWidget2 } from 'vs/editor/browser/widget/diffEditorWidget2/diffEditorWidget2';
 
 /**
  * The text editor that leverages the diff text editor for the editing experience.
@@ -86,7 +87,12 @@ export class TextDiffEditor extends AbstractTextEditor<IDiffEditorViewState> imp
 	}
 
 	protected override createEditorControl(parent: HTMLElement, configuration: ICodeEditorOptions): void {
-		this.diffEditorControl = this._register(this.instantiationService.createInstance(DiffEditorWidget, parent, configuration, {}));
+		const useVersion2 = this.textResourceConfigurationService.getValue(undefined, 'diffEditor.experimental.useVersion2');
+		if (useVersion2) {
+			this.diffEditorControl = this._register(this.instantiationService.createInstance(DiffEditorWidget2, parent, configuration, {}));
+		} else {
+			this.diffEditorControl = this._register(this.instantiationService.createInstance(DiffEditorWidget, parent, configuration, {}));
+		}
 	}
 
 	protected updateEditorControlOptions(options: ICodeEditorOptions): void {
